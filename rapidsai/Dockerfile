@@ -93,28 +93,23 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv
     && rm -rf ./aws ./awscliv2.zip
 
 # Add core tools to base env
-# FIXME: Instal gpuci-tools aarch64 package
-#RUN conda install -y gpuci-tools \
-#    || conda install -y gpuci-tools
+RUN conda install -y gpuci-tools \
+    || conda install -y gpuci-tools
 
-# FIXME: Use gpuci_conda_retry
-#RUN gpuci_conda_retry install -y \
-RUN conda install -y \
+RUN gpuci_conda_retry install -y \
       anaconda-client \
       codecov
 # FIXME: Install rapids-scout-local
 #      rapids-scout-local
 
 # Create `rapids` conda env and make default
-# FIXME: Use gpuci_conda_retry
-# FIXME: Install gpuci-tools
-#RUN gpuci_conda_retry create --no-default-packages --override-channels -n rapids \
-RUN conda create --no-default-packages --override-channels -n rapids \
+RUN gpuci_conda_retry create --no-default-packages --override-channels -n rapids \
       -c nvidia \
       -c conda-forge \
       -c defaults \
       -c gpuci \
       git \
+      gpuci-tools \
       libgcc-ng=${BUILD_STACK_VER} \
       libstdcxx-ng=${BUILD_STACK_VER} \
       python=${PYTHON_VER} \
@@ -129,6 +124,5 @@ RUN ln -s /opt/conda/envs/rapids /opt/conda/envs/gdf
 RUN conda clean -tipsy \
     && chmod -R ugo+w /opt/conda
 
-# FIXME: /usr/bin/tini not found
 ENTRYPOINT [ "/opt/conda/bin/tini", "--" ]
 CMD [ "/bin/bash" ]
